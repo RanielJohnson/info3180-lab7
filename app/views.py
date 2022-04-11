@@ -29,18 +29,6 @@ def index():
 
 # Here we define a function to collect form errors from Flask-WTF
 # which we can later use
-def form_errors(form):
-    error_messages = []
-    """Collects form errors"""
-    for field, errors in form.errors.items():
-        for error in errors:
-            message = u"Error in the %s field - %s" % (
-                    getattr(form, field).label.text,
-                    error
-                )
-            error_messages.append(message)
-
-    return error_messages
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
@@ -68,6 +56,19 @@ def upload():
             return jsonify(form_errors(formobj))
     return jsonify({'message': 'Request not prohibited'})
 
+def form_errors(form):
+    error_messages = []
+    """Collects form errors"""
+    for field, errors in form.errors.items():
+        for error in errors:
+            message = u"Error in the %s field - %s" % (
+                    getattr(form, field).label.text,
+                    error
+                )
+            error_messages.append(message)
+
+    return error_messages
+    
 
 @app.after_request
 def add_header(response):
