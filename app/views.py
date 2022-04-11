@@ -68,7 +68,10 @@ def form_errors(form):
             error_messages.append(message)
 
     return error_messages
-    
+
+@app.route('/api/csrf-token', methods=['GET'])
+def get_csrf():
+    return jsonify({'csrf_token': generate_csrf()})
 
 @app.after_request
 def add_header(response):
