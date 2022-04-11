@@ -8,6 +8,10 @@ This file creates your application.
 from app import app
 from flask import render_template, request, jsonify, send_file
 import os
+from app.forms import UploadForm
+from crypt import methods
+from werkzeug.utils import secure_filename
+from flask_wtf.csrf import generate_csrf
 
 
 ###
@@ -43,6 +47,26 @@ def send_text_file(file_name):
     """Send your static text file."""
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
+
+@app.route('/api/upload',methods=['POST'])
+def upload():
+    if request.method == "POST":
+            formobj = UploadForm()
+            formpic = formobj.photo.data
+            desc = formobj.description.data
+            if formobj.validate_on_submit():
+                filename = secure_filename(formpic.filename)
+                if formobj and (filename != "" and filename != " "):
+                    path = os.path.join(app.config['UPLOAD_FOLDER'],filename)
+                    formobj.save(path)
+                    feedback= {
+                        "message": "File Upload Successful",
+                        "filename": filename,
+                        "description": desc
+                    }
+                    return jsonify(feedback)
+            return jsonify(form_errors(formobj))
+    return jsonify({'message': 'Request not prohibited'})
 
 
 @app.after_request
